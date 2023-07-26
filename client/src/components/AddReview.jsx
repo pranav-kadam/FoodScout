@@ -1,30 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import RestaurantFinder from "../apis/RestaurantFinder";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 
-const AddReview = () => {
+function AddReview() {
   const { id } = useParams();
   const location = useLocation();
-  console.log(location);
-  let navigate = useNavigate();
-  console.log(id);
-
+  const navigate = useNavigate();
+  const [nameError, setNameError] = useState("");
+  const [reviewError, setReviewError] = useState("");
   const [name, setName] = useState("");
   const [reviewText, setReviewText] = useState("");
-  const [rating, setRating] = useState("Rating");
+
+  const selectedOption = useRef(null);
+
+  useEffect(() => {
+    setRating(selectedOption.current.value);
+  }, [selectedOption]);
+
+  const handleSelectOption = (event) => {
+    selectedOption.current = event.target.options[event.target.selectedIndex];
+  };
+
+  const [rating, setRating] = useState("");
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+
+    // Validation check for name and reviewText
+    if (!name.trim()) {
+      setNameError("Name cannot be blank");
+      return;
+    }
+
+    if (!reviewText.trim()) {
+      setReviewError("Review cannot be blank");
+      return;
+    }
+
+    // Reset error messages if fields are not empty
+    setNameError("");
+    setReviewError("");
+
+    // Proceed with API call and submission
     try {
       const response = await RestaurantFinder.post(`/${id}/addReview`, {
         name,
         review: reviewText,
         rating,
       });
+
+      // Only call navigate once since we're navigating to the same path either way
       navigate("/");
-      navigate(location.pathname);
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
+
   return (
     <div className="mb-2">
       <form action="">
@@ -33,20 +64,25 @@ const AddReview = () => {
             <label htmlFor="name">Name</label>
             <input
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setNameError(""); // Clear the error message when the user types
+              }}
               id="name"
               placeholder="name"
               type="text"
               className="form-control"
             />
+            {nameError && <div className="text-danger">{nameError}</div>}
           </div>
+
           <div className="form-group col-4">
             <label htmlFor="rating">Rating</label>
+
             <select
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}
-              id="rating"
-              className="custom-select"
+              className="form-control"
+              ref={selectedOption}
+              onChange={handleSelectOption}
             >
               <option disabled>Rating</option>
               <option value="1">1</option>
@@ -61,11 +97,16 @@ const AddReview = () => {
           <label htmlFor="Review">Review</label>
           <textarea
             value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
+            onChange={(e) => {
+              setReviewText(e.target.value);
+              setReviewError(""); // Clear the error message when the user types
+            }}
             id="Review"
             className="form-control"
           ></textarea>
+          {reviewError && <div className="text-danger">{reviewError}</div>}
         </div>
+
         <button
           type="submit"
           onClick={handleSubmitReview}
@@ -76,6 +117,6 @@ const AddReview = () => {
       </form>
     </div>
   );
-};
+}
 
 export default AddReview;
