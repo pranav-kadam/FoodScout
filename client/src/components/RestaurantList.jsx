@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import StarRating from "./StarRating";
 
 const RestaurantList = (props) => {
-  const { id } = useParams(); // Get the id from URL parameters
+  const { id } = useParams();
   const { restaurants, setRestaurants } = useContext(RestaurantContext);
   let navigate = useNavigate();
 
@@ -50,9 +50,7 @@ const RestaurantList = (props) => {
     }
     return (
       <>
-        <StarRating
-          rating={restaurant.average_rating} // Assuming the actual rating is stored in the 'average_rating' property
-        />
+        <StarRating rating={restaurant.average_rating} />
         <span className="text-warning ml-1">({restaurant.count})</span>
       </>
     );

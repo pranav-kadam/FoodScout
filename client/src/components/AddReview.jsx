@@ -41,7 +41,6 @@ function AddReview() {
     setNameError("");
     setReviewError("");
 
-    // Proceed with API call and submission
     try {
       const response = await RestaurantFinder.post(`/${id}/addReview`, {
         name,
@@ -49,7 +48,6 @@ function AddReview() {
         rating,
       });
 
-      // Only call navigate once since we're navigating to the same path either way
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -66,7 +64,7 @@ function AddReview() {
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
-                setNameError(""); // Clear the error message when the user types
+                setNameError("");
               }}
               id="name"
               placeholder="name"
@@ -99,7 +97,7 @@ function AddReview() {
             value={reviewText}
             onChange={(e) => {
               setReviewText(e.target.value);
-              setReviewError(""); // Clear the error message when the user types
+              setReviewError("");
             }}
             id="Review"
             className="form-control"
